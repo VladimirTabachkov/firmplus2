@@ -20,7 +20,7 @@ public class FilmServiceTest {
     void setUp() {
         filmService = new FilmService();
 
-        filmService.addfilm(
+        filmService.create(
                 new Film(1L,
                        "Хищник: Планета смерти",
                    "Изгнанный из клана хищник Дек отправляется на опасную планету Генна.",
@@ -28,7 +28,7 @@ public class FilmServiceTest {
                      107L,
                              new HashSet<>(Set.of(Genre.FANTASY, Genre.ACTION))
         ));
-        filmService.addfilm(
+        filmService.create(
                 new Film(2L,
                        "Франкенштейн",
                    "1857 год. Команда застрявшего в северных льдах датского корабля спасает раненого мужчину от похожего на человека чудовища",
@@ -40,7 +40,7 @@ public class FilmServiceTest {
 
     @Test
     void testCreate() {
-        Film film = filmService.addfilm(
+        Film film = filmService.create(
                 new Film(3L,
                 "Зверополис 2",
                 "Кролик-полицейский Джуди и лис Ник идут по следу загадочной рептилии, чьё прибытие в Зверополис переворачивает жизнь города с ног на голову",
