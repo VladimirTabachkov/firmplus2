@@ -27,5 +27,4 @@ public class FriendsService {
     public List<Friend> getById(final long userId) {
         return friendRepository.findAll(userId);
     }
-
 }

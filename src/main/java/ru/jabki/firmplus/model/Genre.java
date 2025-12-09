@@ -5,13 +5,13 @@ public enum Genre {
     ADVENTURE(2),
     ANIMATED(3),
     COMEDY(4),
-    DRAMA(4),
-    FANTASY(5),
-    HISTORICAL(6),
-    HORROR(7),
-    NOIR(8),
-    MUSICAL(9),
-    WESTERN(10);
+    DRAMA(5),
+    FANTASY(6),
+    HISTORICAL(7),
+    HORROR(8),
+    NOIR(9),
+    MUSICAL(10),
+    WESTERN(11);
 
     private final int id;
 

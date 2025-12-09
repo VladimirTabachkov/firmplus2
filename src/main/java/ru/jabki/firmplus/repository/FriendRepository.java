@@ -33,13 +33,14 @@ public class FriendRepository {
 
     private final FriendMapper friendMapper;
     private NamedParameterJdbcTemplate jdbcTemplate;
+
     public Friend insert(final Friend friend) {
-        return jdbcTemplate.queryForObject(INSERT, userToSql(friend), friendMapper);
+        return jdbcTemplate.queryForObject(INSERT, friendToSql(friend), friendMapper);
     }
 
     public void delete(final Friend friend) {
         try {
-            jdbcTemplate.queryForObject(DELETE, userToSql(friend), friendMapper);
+            jdbcTemplate.queryForObject(DELETE, friendToSql(friend), friendMapper);
         } catch (Exception e) {
             throw new BadRequestException(String.format("Friend id = %d and User id = %d not found ", friend.getFriendId(), friend.getUserId()));
         }
@@ -53,7 +54,7 @@ public class FriendRepository {
         }
     }
 
-    private MapSqlParameterSource userToSql(final Friend friend) {
+    private MapSqlParameterSource friendToSql(final Friend friend) {
         final MapSqlParameterSource parameterSource = new MapSqlParameterSource();
         parameterSource.addValue("userId", friend.getUserId());
         parameterSource.addValue("friendId", friend.getFriendId());

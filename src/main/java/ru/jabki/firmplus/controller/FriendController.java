@@ -30,8 +30,8 @@ public class FriendController {
 
     @GetMapping("/{id}")
     @Operation(summary = "Получить друзей")
-    public List<Friend> getById(@PathVariable("id") String userId) {
-        return friendService.getById(Long.valueOf(userId));
+    public List<Friend> getById(@PathVariable("userId") Long userId) {
+        return friendService.getById(userId);
     }
 
     @DeleteMapping("/{id}")

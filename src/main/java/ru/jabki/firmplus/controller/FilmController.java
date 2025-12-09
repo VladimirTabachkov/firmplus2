@@ -29,8 +29,8 @@ public class FilmController {
 
     @GetMapping("/{id}")
     @Operation(summary = "Получить данные фильма")
-    public Film getById(@PathVariable("id") String id) {
-        return filmService.getById(Long.parseLong(id));
+    public Film getById(@PathVariable("id") Long id) {
+        return filmService.getById(id);
     }
 
     @PatchMapping
