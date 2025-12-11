@@ -31,6 +31,12 @@ public class FriendRepository {
         WHERE user_id = :userId;
         """;
 
+    private static final String IS_EXISTS = """
+        SELECT COUNT(*) 
+        FROM filmplus.friend
+        WHERE user_id = :userId AND friend_id = :friendId
+        """;
+
     private final FriendMapper friendMapper;
     private NamedParameterJdbcTemplate jdbcTemplate;
 
@@ -54,10 +60,21 @@ public class FriendRepository {
         }
     }
 
+    public boolean exists(long userId, long friendId) {
+        return jdbcTemplate.queryForObject(IS_EXISTS, friendIdsToSql(userId, friendId), Integer.class) > 0;
+    }
+
     private MapSqlParameterSource friendToSql(final Friend friend) {
         final MapSqlParameterSource parameterSource = new MapSqlParameterSource();
         parameterSource.addValue("userId", friend.getUserId());
         parameterSource.addValue("friendId", friend.getFriendId());
+        return parameterSource;
+    }
+
+    private MapSqlParameterSource friendIdsToSql(final Long userId, final Long friendId) {
+        final MapSqlParameterSource parameterSource = new MapSqlParameterSource();
+        parameterSource.addValue("userId", userId);
+        parameterSource.addValue("friendId", friendId);
         return parameterSource;
     }
 }
