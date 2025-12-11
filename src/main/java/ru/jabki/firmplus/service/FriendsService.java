@@ -1,29 +1,30 @@
 package ru.jabki.firmplus.service;
 
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.jabki.firmplus.model.Friend;
+import ru.jabki.firmplus.repository.FriendRepository;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 @Service
+@AllArgsConstructor
 public class FriendsService {
-    private List<Friend> friendList;
+    private final FriendRepository friendRepository;
 
-    public FriendsService() {
-        this.friendList = new ArrayList<>();
+    @Transactional(rollbackFor = Exception.class)
+    public Friend create(final Friend friend) {
+        return friendRepository.insert(friend);
     }
 
-    public void addFriend(Long userId, Long friendId) {
-        friendList.add(new Friend(userId, friendId));
+    @Transactional(rollbackFor = Exception.class)
+    public void delete(final Friend friend) {
+        friendRepository.delete(friend);
     }
 
-    public void delete(Long userId, Long friendId) {
-        friendList.remove(new Friend(userId, friendId));
-    }
-
-    public List<Friend> getFriend(Long friend) {
-        return friendList.stream().filter(f -> (!(friend == null) && (Objects.equals(f.getUserId(), friend) || Objects.equals(f.getFriendId(), friend)))).toList();
+    @Transactional(readOnly = true)
+    public List<Friend> getById(final long userId) {
+        return friendRepository.findAll(userId);
     }
 }

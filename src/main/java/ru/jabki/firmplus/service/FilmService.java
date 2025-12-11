@@ -1,42 +1,54 @@
 package ru.jabki.firmplus.service;
 
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import ru.jabki.firmplus.exception.FilmException;
+import ru.jabki.firmplus.exception.UserException;
 import ru.jabki.firmplus.model.Film;
-import ru.jabki.firmplus.model.Genre;
+import ru.jabki.firmplus.repository.FilmRepository;
 
 import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
 
 @Service
+@AllArgsConstructor
 public class FilmService {
-    private static Set<Film> films = new HashSet<>();
+    private final FilmRepository filmRepository;
 
-    public Film addfilm(final Film film) {
-        validateFilm(film);
-        films.add(film);
+    @Transactional(rollbackFor = Exception.class)
+    public Film create(final Film film) {
+        validate(film);
+        return filmRepository.insert(film);
+    }
+
+    @Transactional(readOnly = true)
+    public Film getById(final Long id) {
+        final Film film = filmRepository.findById(id);
+        if (film == null) {
+            throw new UserException("Film not found");
+        }
         return film;
     }
 
-    public Film getbyId(final Long id) {
-        return films.stream().filter(f -> f.getId() == id).findFirst().orElseThrow(() -> new FilmException("Movie not found"));
+    @Transactional(rollbackFor = Exception.class)
+    public void delete(final Long id) {
+        filmRepository.delete(id);
     }
 
-    public void deleteFilm(final Long id) {
-        films.remove(getbyId(id));
+    @Transactional(rollbackFor = Exception.class)
+    public Film update(final Film film) {
+        validate(film);
+        final Film existFilm = getById(film.getId());
+        existFilm.setName(film.getName());
+        existFilm.setDescription(film.getDescription());
+        existFilm.setReleaseDate(film.getReleaseDate());
+        existFilm.setDuration(film.getDuration());
+        existFilm.setGenres(film.getGenres());
+        return filmRepository.update(existFilm);
     }
 
-    public void updateFilm(final Film film) {
-        Film temp = getbyId(film.getId());
-        temp.setDescription(film.getDescription());
-        temp.setGenres(film.getGenres());
-    }
-
-    private void validateFilm(Film film) {
+    private void validate(Film film) {
         if (film == null) {
             throw new FilmException("Film is null");
         }
@@ -49,13 +61,5 @@ public class FilmService {
         if (film.getReleaseDate() == null || film.getReleaseDate().isAfter(LocalDate.now())) {
             throw new FilmException("Date is incorrect");
         }
-    }
-
-    public List<Film> searchFilm(String name, String description, String duration, LocalDate localdate, Set<Genre> genres) {
-        return films.stream().filter(f -> (!StringUtils.hasText(name) || f.getName().toLowerCase().contains(name.toLowerCase())) &&
-                (!StringUtils.hasText(description) || f.getDescription().toLowerCase().contains(description.toLowerCase())) &&
-                (!StringUtils.hasText(duration) || Objects.equals(f.getDuration(), Long.parseLong(duration))) &&
-                (localdate == null || Objects.equals(f.getReleaseDate(), localdate)) &&
-                (genres == null || f.getGenres().equals(genres))).toList();
     }
 }

@@ -1,64 +1,65 @@
 package ru.jabki.firmplus.service;
 
-import ru.jabki.firmplus.exception.FilmException;
+import lombok.AllArgsConstructor;
+import org.springframework.transaction.annotation.Transactional;
 import ru.jabki.firmplus.exception.UserException;
 import ru.jabki.firmplus.model.User;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
+import ru.jabki.firmplus.repository.UserRepository;
 
 import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Set;
 
 @Service
+@AllArgsConstructor
 public class UserService {
-    private static Set<User> users = new HashSet<>();
+    private final UserRepository userRepository;
 
-    public User addUser(User user) {
-        validateUser(user);
-        user.setId((long) users.size());
-        users.add(user);
-        return user;
+    @Transactional(rollbackFor = Exception.class)
+    public User create(final User user) {
+        validate(user);
+        return userRepository.insert(user);
     }
 
-    public User addUser(String name, String email, String login, LocalDate birthday) {
-        validateUserData(name, email, login, birthday);
-        User newuser = new User(name, email, login, birthday);
-        newuser.setId((long) users.size());
-        users.add(newuser);
-        return newuser;
-    }
-
-    private void validateUser(User user) {
+    private void validate(User user) {
         if (user == null) {
             throw new UserException("User is null");
         }
-        validateUserData(user.getName(), user.getEmail(), user.getLogin(), user.getBirthday());
-    }
-
-    private void validateUserData(String name, String email, String login, LocalDate birthday) {
-
-        if (!StringUtils.hasText(email) || !StringUtils.hasText(name)) {
-            throw new UserException("One of the parameters is empty: name - " + name + " email - " + email);
+        if (!StringUtils.hasText(user.getEmail())) {
+            throw new UserException("User email is empty");
         }
-        if (!StringUtils.hasText(login) || birthday.isAfter(LocalDate.now())) {
-            throw new UserException("One of the parameters is empty: login - " + login + " birthday - " + birthday);
+        if (!StringUtils.hasText(user.getName())) {
+            throw new UserException("User name is empty");
+        }
+        if (!StringUtils.hasText(user.getLogin())) {
+            throw new UserException("User login is empty");
+        }
+        if (user.getBirthday().isAfter(LocalDate.now())) {
+            throw new UserException("User birthday not correct");
         }
     }
 
-    public User getbyId(final Long id) {
-        return users.stream().filter(f -> Objects.equals(f.getId(), id)).findFirst().orElseThrow(() -> new FilmException("Movie not found"));
+    @Transactional(readOnly = true)
+    public User getById(final Long id) {
+        final User user = userRepository.findById(id);
+        if (user == null) {
+            throw new UserException("User not found");
+        }
+        return user;
     }
 
-    public void deleteUser(final Long id) {
-        users.remove(getbyId(id));
+    @Transactional(rollbackFor = Exception.class)
+    public void delete(final Long id) {
+        userRepository.delete(id);
     }
 
-    public void updateUser(User user) {
-        User tmp = getbyId(user.getId());
-        tmp.setName(user.getName());
-        tmp.setEmail(user.getEmail());
-        tmp.setBirthday(user.getBirthday());
+    @Transactional(rollbackFor = Exception.class)
+    public User update(User user) {
+        validate(user);
+        final User existUser = getById(user.getId());
+        existUser.setName(user.getName());
+        existUser.setEmail(user.getEmail());
+        existUser.setBirthday(user.getBirthday());
+        return userRepository.update(existUser);
     }
 }
