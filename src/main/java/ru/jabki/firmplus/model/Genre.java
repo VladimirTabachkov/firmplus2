@@ -18,4 +18,4 @@ public class Genre
     public String getGenre(int id) {
         return stringList[id];
     }
-};
+}
