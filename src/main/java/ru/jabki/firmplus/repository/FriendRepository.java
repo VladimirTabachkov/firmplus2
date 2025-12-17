@@ -26,13 +26,13 @@ public class FriendRepository {
         """;
 
     private static final String GET_ALL_FRIEND = """
-        SELECT * 
+        SELECT *
         FROM filmplus.friend
         WHERE user_id = :userId;
         """;
 
     private static final String IS_EXISTS = """
-        SELECT COUNT(*) 
+        SELECT COUNT(*)
         FROM filmplus.friend
         WHERE user_id = :userId AND friend_id = :friendId
         """;

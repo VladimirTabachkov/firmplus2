@@ -31,7 +31,7 @@ public class FilmRepository {
             """;
 
     private static final String GET_BY_ID = """
-            SELECT * 
+            SELECT *
             FROM filmplus.movie
             WHERE id = :id;
             """;
@@ -70,12 +70,7 @@ public class FilmRepository {
         params.addValue("description", film.getDescription());
         params.addValue("release_date", film.getReleaseDate());
         params.addValue("duration", film.getDuration());
-        params.addValue(
-                "genres",
-                film.getGenres().stream()
-                        .map(Enum::name)
-                        .toArray(String[]::new)
-        );
+        params.addValue("genres", film.getGenres());
         return params;
     }
 }

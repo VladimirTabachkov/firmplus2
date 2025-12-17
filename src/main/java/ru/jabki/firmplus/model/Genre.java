@@ -1,25 +1,21 @@
 package ru.jabki.firmplus.model;
 
-public enum Genre {
-    ACTION(1),
-    ADVENTURE(2),
-    ANIMATED(3),
-    COMEDY(4),
-    DRAMA(5),
-    FANTASY(6),
-    HISTORICAL(7),
-    HORROR(8),
-    NOIR(9),
-    MUSICAL(10),
-    WESTERN(11);
+public class Genre
+{
+    public String[] stringList = new String[]
+                {"ACTION",
+                 "ADVENTURE",
+                 "ANIMATED",
+                 "COMEDY",
+                 "DRAMA",
+                 "FANTASY",
+                 "HISTORICAL",
+                 "HORROR",
+                 "NOIR",
+                 "MUSICAL",
+                 "WESTERN"};
 
-    private final int id;
-
-    public int gatId() {
-        return this.id;
-    }
-
-    Genre(int id) {
-        this.id = id;
+    public String getGenre(int id) {
+        return stringList[id];
     }
 };
