@@ -8,6 +8,8 @@ import ru.jabki.firmplus.exception.BadRequestException;
 import ru.jabki.firmplus.mapper.FilmMapper;
 import ru.jabki.firmplus.model.Film;
 
+import java.util.List;
+
 @Repository
 @AllArgsConstructor
 public class FilmRepository {
@@ -34,6 +36,13 @@ public class FilmRepository {
             SELECT *
             FROM filmplus.movie
             WHERE id = :id;
+            """;
+
+    private static final String SEARCH = """
+            SELECT *
+            FROM filmplus.film
+            WHERE upper(name) like upper('%'||:name||'%')
+              and extract(YEAR from releasedate) = :year;
             """;
 
     private final FilmMapper filmMapper;
@@ -63,6 +72,10 @@ public class FilmRepository {
         }
     }
 
+    public List<Film> search(final String name, final int year) {
+        return jdbcTemplate.query(SEARCH, ParamForSearchSQL(name, year), filmMapper);
+    }
+
     private MapSqlParameterSource filmToSql(final Film film) {
         final MapSqlParameterSource params = new MapSqlParameterSource();
         params.addValue("id", film.getId());
@@ -71,6 +84,13 @@ public class FilmRepository {
         params.addValue("release_date", film.getReleaseDate());
         params.addValue("duration", film.getDuration());
         params.addValue("genres", film.getGenres());
+        return params;
+    }
+
+    private MapSqlParameterSource ParamForSearchSQL(final String name, final int year) {
+        final MapSqlParameterSource params = new MapSqlParameterSource();
+        params.addValue("name", name);
+        params.addValue("year", year);
         return params;
     }
 }
